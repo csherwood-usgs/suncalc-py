@@ -141,17 +141,30 @@ print('Sunset : ',times['sunset'])
 
 # +
 start = datetime(2022, 1, 1, 17, 0, tzinfo=timezone.utc)
-dates = [start + timedelta(days=i) for i in range(10)])
-lons = lng*np.ones_like(dates)
-lats = lat*np.ones_like(dates)
+dates = [start + timedelta(days=i) for i in range(10)]
+sunrise = np.ones_like(dates)
+sunset = np.ones_like(dates)
 
+for i, dt in enumerate(dates):
+    times = get_times(dt, lng, lat)
+    sunrise[i] = times['sunrise']
+    sunset[i]  = times['sunset']
 
+print(sunrise)
+
+df = pd.DataFrame({'date':dates,'sunrise':sunrise,'sunset':sunset})
+df.to_csv('marconi_sunrise_sunset.csv',index=False)
+
+# +
+# get values for specific date
+df.set_index(pd.DatetimeIndex(df.date), inplace=True)
+
+df.sort_index().loc['2022-01-05']['sunrise'].values
 # -
-
-print(date)
 
 pd.to_datetime(dates)
 
+# This is a reasonable way to create a dataframe with date range and columns of lat/lon
 dates = pd.date_range(start="2022-03-04 17:00:00",
                                    end = '2022-03-13 17:00:00',
                                    freq = '1D',
@@ -166,12 +179,9 @@ df = pd.DataFrame({
 })
 print(df)
 
-# +
-
+# ...but suncalc.py cannot convert the DateTimeIndex to a datetime. I think this is a missing feature in suncalc-py
 df['sunrise'] = get_times(df['date'], df['lon'], df['lat'])['sunrise']
 print(df)
-#df2=pd.DataFrame(get_times(df['date'], df['lon'], df['lat']))
-#df2
-# -
+
 
 
