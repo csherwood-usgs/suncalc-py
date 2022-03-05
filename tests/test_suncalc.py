@@ -1,14 +1,13 @@
-from datetime import datetime, timezone
+# +
+# Modified version of the test file provided in suncalc-py
+
+# I copied suncalc.py into this directory, rather than installing it
+from suncalc import get_position, get_times
+
+from datetime import datetime, timezone, timedelta
 
 import numpy as np
 import pandas as pd
-
-from suncalc import get_position, get_times
-
-date = datetime(2013, 3, 5, tzinfo=timezone.utc)
-lat = 50.5
-lng = 30.5
-height = 2000
 
 testTimes = {
     'solar_noon': '2013-03-05T10:10:57Z',
@@ -32,14 +31,12 @@ heightTestTimes = {
     'sunrise': '2013-03-05T04:25:07Z',
     'sunset': '2013-03-05T15:56:46Z'}
 
-
 def test_get_position():
     """getPosition returns azimuth and altitude for the given time and location
     """
     pos = get_position(date, lng, lat)
     assert np.isclose(pos['azimuth'], -2.5003175907168385)
     assert np.isclose(pos['altitude'], -0.7000406838781611)
-
 
 def test_get_times():
     """getTimes returns sun phases for the given date and location
@@ -48,7 +45,6 @@ def test_get_times():
     for key, value in testTimes.items():
         assert times[key].strftime("%Y-%m-%dT%H:%M:%SZ") == value
 
-
 def test_get_times_height():
     """getTimes adjusts sun phases when additionally given the observer height
     """
@@ -56,14 +52,12 @@ def test_get_times_height():
     for key, value in heightTestTimes.items():
         assert times[key].strftime("%Y-%m-%dT%H:%M:%SZ") == value
 
-
 def test_get_position_pandas_single_timestamp():
     ts_date = pd.Timestamp(date)
 
     pos = get_position(ts_date, lng, lat)
     assert np.isclose(pos['azimuth'], -2.5003175907168385)
     assert np.isclose(pos['altitude'], -0.7000406838781611)
-
 
 def test_get_position_pandas_datetime_series():
     df = pd.DataFrame({'date': [date] * 3, 'lat': [lat] * 3, 'lng': [lng] * 3})
@@ -78,19 +72,16 @@ def test_get_position_pandas_datetime_series():
     assert np.isclose(pos['azimuth'].iloc[0], -2.5003175907168385)
     assert np.isclose(pos['altitude'].iloc[0], -0.7000406838781611)
 
-
 def test_get_times_pandas_single():
     times = get_times(date, lng, lat)
 
     assert isinstance(times['solar_noon'], pd.Timestamp)
-
 
 def test_get_times_datetime_single():
     times = get_times(date, lng, lat)
 
     # This is true because pd.Timestamp is an instance of datetime.datetime
     assert isinstance(times['solar_noon'], datetime)
-
 
 def test_get_times_arrays():
     df = pd.DataFrame({'date': [date] * 3, 'lat': [lat] * 3, 'lng': [lng] * 3})
@@ -101,7 +92,6 @@ def test_get_times_arrays():
 
     assert times['solar_noon'].iloc[0].strftime(
         "%Y-%m-%dT%H:%M:%SZ") == testTimes['solar_noon']
-
 
 def test_get_times_for_high_latitudes():
     """getTimes may fail (maybe only on Windows?) for high latitudes in the summer
@@ -117,29 +107,71 @@ def test_get_times_for_high_latitudes():
     times = get_times(date, lng, lat)
 
 
-# t.test('getMoonPosition returns moon position data given time and location', function (t) {
-#     var moonPos = SunCalc.getMoonPosition(date, lng, lat);
-#
-#     t.ok(near(moonPos.azimuth, -0.9783999522438226), 'azimuth');
-#     t.ok(near(moonPos.altitude, 0.014551482243892251), 'altitude');
-#     t.ok(near(moonPos.distance, 364121.37256256194), 'distance');
-#     t.end();
-# });
-#
-# t.test('getMoonIllumination returns fraction and angle of moon\'s illuminated limb and phase', function (t) {
-#     var moonIllum = SunCalc.getMoonIllumination(date);
-#
-#     t.ok(near(moonIllum.fraction, 0.4848068202456373), 'fraction');
-#     t.ok(near(moonIllum.phase, 0.7548368838538762), 'phase');
-#     t.ok(near(moonIllum.angle, 1.6732942678578346), 'angle');
-#     t.end();
-# });
-#
-# t.test('getMoonTimes returns moon rise and set times', function (t) {
-#     var moonTimes = SunCalc.getMoonTimes(new Date('2013-03-04UTC'), lng, lat, true);
-#
-#     t.equal(moonTimes.rise.toUTCString(), 'Mon, 04 Mar 2013 23:54:29 GMT');
-#     t.equal(moonTimes.set.toUTCString(), 'Mon, 04 Mar 2013 07:47:58 GMT');
-#
-#     t.end();
-# });
+# +
+# Need these specific inputs to run tests
+date = datetime(2013, 3, 5, tzinfo=timezone.utc)
+lat = 50.5
+lng = 30.5
+height = 2000
+
+# Nothing will be returned if tests are successful
+test_get_position()
+test_get_times()
+test_get_times_height()
+test_get_position_pandas_single_timestamp()
+#test_get_position_pandas_datetime_series() #This doesnt work
+test_get_times_pandas_single()
+test_get_times_datetime_single()
+test_get_times_arrays()
+test_get_times_for_high_latitudes()
+
+# +
+date = datetime(2022, 3, 4, 17, 0, tzinfo=timezone.utc)
+print(date)
+lat = 41.893
+lng = -69.963
+height = 20.
+
+pos = get_position(date,lng,lat)
+print(pos)
+times = get_times(date, lng, lat)
+print('Sunrise: ',times['sunrise'])
+print('Noon   : ',times['solar_noon'])
+print('Sunset : ',times['sunset'])
+
+# +
+start = datetime(2022, 1, 1, 17, 0, tzinfo=timezone.utc)
+dates = [start + timedelta(days=i) for i in range(10)])
+lons = lng*np.ones_like(dates)
+lats = lat*np.ones_like(dates)
+
+
+# -
+
+print(date)
+
+pd.to_datetime(dates)
+
+dates = pd.date_range(start="2022-03-04 17:00:00",
+                                   end = '2022-03-13 17:00:00',
+                                   freq = '1D',
+                                   tz=timezone.utc).values
+print(np.shape(dates))
+print(type(dates[0]))
+df = pd.DataFrame({
+     'date': [pd.to_datetime(dates)],
+
+     'lon': [lons],
+     'lat': [lats]
+})
+print(df)
+
+# +
+
+df['sunrise'] = get_times(df['date'], df['lon'], df['lat'])['sunrise']
+print(df)
+#df2=pd.DataFrame(get_times(df['date'], df['lon'], df['lat']))
+#df2
+# -
+
+
