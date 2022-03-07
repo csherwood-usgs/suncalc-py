@@ -126,6 +126,7 @@ test_get_times_arrays()
 test_get_times_for_high_latitudes()
 
 # +
+# Here is a test with coordinates for Marconi camera (CACO-02)
 date = datetime(2022, 3, 4, 17, 0, tzinfo=timezone.utc)
 print(date)
 lat = 41.893
